@@ -1,9 +1,16 @@
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { Formik, useFormik } from 'formik';
-import * as yup from 'yup';
+import Box from '@mui/material/Box'
+import Modal from '@mui/material/Modal'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import { useFormik } from 'formik'
+import * as yup from 'yup'
+import { useDispatch, useSelector } from 'react-redux'
+import { checkinAction } from '../../features/redux/actions/customerAction'
+import { useParams } from 'react-router-dom'
+import { useState } from 'react'
+import spinner from '../../assets/spinner.gif'
+import DoneIcon from '@mui/icons-material/Done'
+import { getAdminService } from '../../features/services/adminServices'
 
 const style = {
   position: 'absolute',
@@ -17,17 +24,23 @@ const style = {
   pt: 2,
   px: 4,
   pb: 3,
-};
-
-const TRACKING_CODE = '123'
+}
 
 const ModalPassword = ({ open, handleClose }) => {
 
+  const [loading, setLoading] = useState(false)
+  const [checkingSuccess, setCheckingSuccess] = useState(false)
+  const [buttonDisabled, setButtonDisabled] = useState(false)
+
+  const dispatch = useDispatch()
+  const { status } = useSelector((state) => state.customer)
+
+  const { id } = useParams()
   const validationSchema = yup.object({
     code: yup
       .string('Enter your admin code')
       .required('Code is required')
-  });
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -35,21 +48,34 @@ const ModalPassword = ({ open, handleClose }) => {
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm, setErrors }) => {
-      console.log(values)
-
-      //! DESHABILITAR BOTON LUEGO DE ENVIAR FORM
       const { code } = values
-      if (code === TRACKING_CODE) {
-        console.log('OK', values)
-        resetForm()
-      } else {
-        console.log('ERROR', values)
-        setErrors({ code: 'Bad code' })
-      }
+      getAdminService()
+        .then(({ password: COSECHA_CODE }) => {
+          if (code === COSECHA_CODE) {
+            setLoading(true)
+            const checkin = new Date().toLocaleString()
+            const update = { checkin, id }
+            dispatch(checkinAction(update))
+              .then((response) => {
+                if (response.payload && status === 'success') {
+                  setLoading(false)
+                  setCheckingSuccess(true)
+                  setButtonDisabled(true)
+                  setTimeout(() => {
+                    handleClose()
+                    setButtonDisabled(false)
+                    setCheckingSuccess(false)
+                  }, 1500)
+                }
+              })
+            resetForm()
+          } else {
+            setErrors({ code: 'Bad code' })
+          }
+
+        })
     },
-  });
-
-
+  })
 
   return (
     <div>
@@ -67,6 +93,10 @@ const ModalPassword = ({ open, handleClose }) => {
           <form onSubmit={formik.handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
             <Box
               sx={{ width: 500, maxWidth: '100%', paddingBottom: '16px' }}
+              display='flex'
+              flexDirection='column'
+              alignItems='center'
+              gap='24px'
             >
               <TextField
                 sx={{ border: 'black' }}
@@ -81,6 +111,14 @@ const ModalPassword = ({ open, handleClose }) => {
                 error={formik.touched.code && Boolean(formik.errors.code)}
                 helperText={formik.touched.code && formik.errors.code}
               />
+              {loading
+                ? <img src={spinner} alt="icon" width="50" />
+                : null
+              }
+              {checkingSuccess
+                ? <DoneIcon color='success' />
+                : null
+              }
             </Box>
             <Button
               className='tracking'
@@ -88,10 +126,10 @@ const ModalPassword = ({ open, handleClose }) => {
               color='primary'
               size="large"
               type='submit'
+              disabled={buttonDisabled}
             >
               REGISTRAR VISITA
             </Button>
-
           </form>
         </Box>
       </Modal>

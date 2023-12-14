@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path='/*' element={<Navigate to='/customer' />} />
         <Route element={<AppContainer />}>
-          <Route path='/customer' element={<Customer />} />
+          <Route path='/customer/:id' element={<Customer />} />
           <Route path='/panel' element={<Panel />} />
         </Route>
       </Routes>

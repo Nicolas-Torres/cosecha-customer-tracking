@@ -5,7 +5,7 @@ const Container = ({ children }) => {
   return (
     <>
       <Header />
-      <Box display='flex' justifyContent='center' paddingTop='24px' height='400px' >
+      <Box display='flex' justifyContent='center' paddingTop='24px'  >
         {children}
       </Box>
     </>
