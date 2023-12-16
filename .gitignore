@@ -25,3 +25,5 @@ dist-ssr
 
 .env
 /src/customers*
+# Local Netlify folder
+.netlify

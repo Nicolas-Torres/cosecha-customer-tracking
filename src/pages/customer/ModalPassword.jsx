@@ -88,7 +88,7 @@ const ModalPassword = ({ open, handleClose }) => {
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
       >
-        <Box sx={{ ...style, width: 400, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ ...style, width: 300, display: 'flex', flexDirection: 'column' }}>
           <h2 id="parent-modal-title">Código de administrador:</h2>
           <form onSubmit={formik.handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
             <Box
