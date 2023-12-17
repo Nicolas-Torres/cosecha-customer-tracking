@@ -53,7 +53,7 @@ const ModalPassword = ({ open, handleClose }) => {
         .then(({ password: COSECHA_CODE }) => {
           if (code === COSECHA_CODE) {
             setLoading(true)
-            const checkin = new Date().toLocaleString()
+            const checkin = new Date().toLocaleString('es-PE')
             const update = { checkin, id }
             dispatch(checkinAction(update))
               .then((response) => {
